@@ -41,6 +41,7 @@ governance = [
 ]
 llm = [
     "anthropic>=0.30",
+    "google-genai>=1.0",
     "openai>=1.0",
 ]
 dev = [
@@ -120,6 +121,8 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = [
     "anthropic.*",
+    "google.genai.*",
+    "google.genai",
     "openai.*",
     "crewai.*",
     "crewpilot.*",
