@@ -1,0 +1,140 @@
+[project]
+name = "researchcrew"
+version = "0.1.0"
+description = "Multi-agent scientific research library: Co-Scientist + MLEvolve on CrewAI."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+authors = [{ name = "ResearchCrew Contributors" }]
+license = { text = "MIT" }
+keywords = ["crewai", "research", "agents", "llm", "science", "hypothesis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "crewai>=0.80",
+    "pydantic>=2.0",
+    "click>=8.0",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+memory = [
+    "rank-bm25>=0.2",
+    "faiss-cpu>=1.7",
+    "sentence-transformers>=3.0",
+]
+literature = [
+    "httpx>=0.27",
+]
+writing = [
+    "jinja2>=3.1",
+]
+governance = [
+    "crewpilot @ git+https://github.com/bsfeal/crewpilot.git",
+]
+llm = [
+    "anthropic>=0.30",
+    "openai>=1.0",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-timeout>=2.3",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pytest-mock>=3.14",
+]
+all = [
+    "researchcrew[memory,literature,writing,llm]",
+]
+
+[project.scripts]
+researchcrew = "researchcrew.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/researchcrew"]
+
+[tool.ruff]
+src = ["src"]
+target-version = "py310"
+fix = true
+respect-gitignore = true
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+future-annotations = true
+extend-select = [
+    "E", "F", "B", "S", "RUF", "N", "W", "I", "T", "PERF", "PIE",
+    "TID", "RET", "SIM118",
+    "UP006", "UP007", "UP035", "UP037", "UP045", "UP004", "UP008",
+    "UP010", "UP018", "UP031", "UP032",
+    "I001", "I002",
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
+[tool.ruff.lint.isort]
+no-sections = false
+case-sensitive = true
+combine-as-imports = true
+force-sort-within-sections = true
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+lines-after-imports = 2
+split-on-trailing-comma = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "RET504", "S105", "S106", "T201"]
+"examples/**/*.py" = ["T201", "RUF001", "S101"]
+
+[tool.mypy]
+strict = true
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+show_error_codes = true
+warn_unused_ignores = true
+python_version = "3.12"
+exclude = "^tests/"
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "anthropic.*",
+    "openai.*",
+    "crewai.*",
+    "crewpilot.*",
+    "rank_bm25.*",
+    "faiss.*",
+    "sentence_transformers.*",
+    "httpx.*",
+    "jinja2.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "--tb=short --timeout=60 --import-mode=importlib"
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
