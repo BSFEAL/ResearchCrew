@@ -8,6 +8,7 @@ from researchcrew.literature.corpus import LiteratureCorpus, Paper
 from researchcrew.literature.gap_analyzer import GapAnalyzer, ResearchGap
 from researchcrew.literature.screener import ScreeningCriteria, TwoPhaseScreener
 from researchcrew.literature.searcher import MultiSourceSearcher
+from researchcrew.llm import AnthropicResearchLLM, LLMDebateJudge, OpenAIResearchLLM, ResearchLLM
 from researchcrew.memory.entry import MemoryEntry, OutcomeLabel
 from researchcrew.memory.retriever import BM25Retriever, EnsembleRetriever, FAISSRetriever
 from researchcrew.memory.store import MemoryStore
@@ -81,4 +82,9 @@ __all__ = [
     "HypothesisVariantBridge",
     "MetaReviewOptimizer",
     "ResearchGatePolicy",
+    # llm
+    "AnthropicResearchLLM",
+    "LLMDebateJudge",
+    "OpenAIResearchLLM",
+    "ResearchLLM",
 ]
