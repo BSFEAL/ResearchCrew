@@ -48,6 +48,11 @@ mcp = [
     "fastmcp>=3.0",
     "httpx>=0.27",
 ]
+chat = [
+    "anthropic>=0.50",
+    "rich>=13.0",
+    "prompt_toolkit>=3.0",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
@@ -58,15 +63,19 @@ dev = [
     "pytest-mock>=3.14",
 ]
 all = [
-    "researchcrew[memory,literature,writing,llm,mcp]",
+    "researchcrew[memory,literature,writing,llm,mcp,chat]",
 ]
 
 [project.scripts]
 researchcrew = "researchcrew.cli:app"
+researchcrew-chat = "researchcrew.tools.chat:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/researchcrew"]
@@ -143,7 +152,7 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "--tb=short --timeout=60 --import-mode=importlib"
+addopts = "--tb=short --import-mode=importlib"
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
