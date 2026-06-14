@@ -190,17 +190,44 @@ Results are sorted by `citation_count` descending, then truncated to `max_result
 
 The server runs over stdio and is compatible with any MCP client (Claude Desktop, Cursor, Zed, etc.).
 
-**Claude Desktop config** (`claude_desktop_config.json`):
+### Auto-connect via `.mcp.json`
+
+The repository ships a `.mcp.json` at its root. Claude Code picks this up automatically and connects **both** the paper-search server and the Colab runtime server without any extra setup:
+
+```json
+{
+  "mcpServers": {
+    "researchcrew-papers": {
+      "command": "python",
+      "args": ["-m", "researchcrew.mcp.papers"]
+    },
+    "colab-mcp": {
+      "command": "uvx",
+      "args": ["git+https://github.com/googlecolab/colab-mcp"],
+      "timeout": 30000
+    }
+  }
+}
+```
+
+### Manual Claude Desktop config (`claude_desktop_config.json`)
 
 ```json
 {
   "mcpServers": {
     "researchcrew-papers": {
       "command": "researchcrew-papers"
+    },
+    "colab-mcp": {
+      "command": "uvx",
+      "args": ["git+https://github.com/googlecolab/colab-mcp"],
+      "timeout": 30000
     }
   }
 }
 ```
+
+See [colab.md](colab.md) for full details on the Colab MCP connection.
 
 ---
 

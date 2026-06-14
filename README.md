@@ -117,7 +117,8 @@ researchcrew/
     ├── literature_search.py   # CrewAI LiteratureSearchTool
     ├── hypothesis_store.py    # CrewAI HypothesisStoreTool
     ├── debate_tool.py         # CrewAI DebateTool
-    └── memory_query.py        # CrewAI MemoryQueryTool
+    ├── memory_query.py        # CrewAI MemoryQueryTool
+    └── colab_tool.py          # CrewAI Colab tools (execute, install, runtime)
 ```
 
 ---
@@ -133,6 +134,9 @@ pip install 'researchcrew[llm]'
 
 # With MCP paper search server
 pip install 'researchcrew[mcp]'
+
+# With Google Colab runtime tools
+pip install 'researchcrew[colab]'
 
 # With the TUI chat interface
 pip install 'researchcrew[chat]'
@@ -155,7 +159,9 @@ from researchcrew.llm import create_llm
 
 llm = create_llm("anthropic")  # uses ANTHROPIC_API_KEY from env
 
-crew = make_co_scientist_crew(llm=llm, verbose=True)
+# Pass use_colab=True to let the Evolution agent run live experiments
+# in a Google Colab GPU runtime (requires colab-mcp, see docs/colab.md)
+crew = make_co_scientist_crew(llm=llm, verbose=True, use_colab=False)
 result = crew.kickoff(inputs={
     "research_goal": (
         "Identify drug repurposing candidates for AML by targeting "
@@ -215,6 +221,25 @@ papers = search_papers("attention transformer", max_results=10, year_from=2020)
 paper  = fetch_paper("1706.03762")          # arXiv ID
 cites  = get_citations("1706.03762", limit=20)
 ```
+
+### 5. Connect Google Colab as a Runtime
+
+The `.mcp.json` at the repo root auto-connects **both** `researchcrew-papers` and `colab-mcp` for Claude Code and Claude Desktop users. No manual configuration required.
+
+To run code in a Colab GPU runtime from inside a crew:
+
+```python
+from researchcrew.tools import ColabExecuteTool, ColabInstallTool, ColabRuntimeTool
+
+# Standalone usage
+execute = ColabExecuteTool()
+print(execute._run("import torch; print(torch.cuda.get_device_name(0))"))
+
+# Or enable Colab in the Co-Scientist crew
+crew = make_co_scientist_crew(llm=llm, use_colab=True)
+```
+
+The colab-mcp server launches automatically via `uvx`. Set `COLAB_MCP_URL=http://host:port` to point at an already-running server instead. See [docs/colab.md](docs/colab.md) for full details.
 
 ---
 
@@ -463,6 +488,7 @@ pytest tests/ -v
 ```bash
 pytest tests/test_papers_mcp.py   # MCP paper search (30 tests, no network)
 pytest tests/test_chat.py         # TUI chat helpers (25 tests)
+pytest tests/test_colab_tool.py   # Colab tools (18 tests, no real Colab needed)
 pytest tests/test_elo.py          # Elo rating engine
 pytest tests/test_tournament.py   # Debate & tournament
 pytest tests/test_literature.py   # Literature pipeline
@@ -481,6 +507,7 @@ pytest tests/test_llm.py          # LLM providers (unit-level)
 |---|---|---|
 | `llm` | `anthropic`, `openai`, `google-genai` | LLM providers |
 | `mcp` | `fastmcp`, `httpx` | MCP paper search server |
+| `colab` | `fastmcp` | Google Colab runtime tools via colab-mcp |
 | `chat` | `anthropic`, `rich`, `prompt_toolkit` | TUI chat interface |
 | `literature` | `httpx` | Live literature search |
 | `memory` | `rank-bm25`, `faiss-cpu`, `sentence-transformers` | Semantic memory |

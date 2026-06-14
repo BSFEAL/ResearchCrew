@@ -19,6 +19,7 @@ crew = make_co_scientist_crew(
     llm=llm,
     verbose=True,
     max_tournament_rounds=3,
+    use_colab=False,   # set True to give Evolution agent a live Colab runtime
 )
 ```
 
@@ -42,9 +43,11 @@ print(result)
 | **Reflection** | Score novelty & feasibility | `HypothesisStoreTool` |
 | **Proximity** | Semantic deduplication / clustering | `HypothesisStoreTool` |
 | **Ranking** | Run Elo tournament debates | `DebateTool`, `HypothesisStoreTool` |
-| **Evolution** | Improve top hypotheses | `HypothesisStoreTool`, `MemoryQueryTool` |
+| **Evolution** | Improve top hypotheses | `HypothesisStoreTool`, `MemoryQueryTool` · `ColabExecuteTool`, `ColabInstallTool`, `ColabRuntimeTool` ¹ |
 | **Meta-review** | Synthesise results, produce research brief | `MemoryQueryTool` |
 | **Supervisor** | Hierarchical manager (not a task agent) | — |
+
+¹ Colab tools are added only when `use_colab=True` is passed to `make_co_scientist_crew()`. See [colab.md](colab.md).
 
 ### Task Pipeline
 
@@ -138,7 +141,7 @@ print(paper)
 
 ## CrewAI Tools
 
-The crews use four CrewAI-native tool wrappers:
+The crews use seven CrewAI-native tool wrappers:
 
 | Tool | Class | Description |
 |---|---|---|
@@ -146,19 +149,25 @@ The crews use four CrewAI-native tool wrappers:
 | `HypothesisStoreTool` | `researchcrew.tools.hypothesis_store` | In-memory hypothesis CRUD |
 | `DebateTool` | `researchcrew.tools.debate_tool` | Runs pairwise Elo debates |
 | `MemoryQueryTool` | `researchcrew.tools.memory_query` | Retrieves from the knowledge store |
+| `ColabExecuteTool` | `researchcrew.tools.colab_tool` | Execute Python code in a Colab runtime |
+| `ColabInstallTool` | `researchcrew.tools.colab_tool` | Install packages into the Colab runtime |
+| `ColabRuntimeTool` | `researchcrew.tools.colab_tool` | Query Colab runtime status (GPU/RAM) |
 
 These can be used individually in custom crews:
 
 ```python
-from researchcrew.tools import LiteratureSearchTool, HypothesisStoreTool
+from researchcrew.tools import LiteratureSearchTool, HypothesisStoreTool, ColabExecuteTool
 
-search = LiteratureSearchTool()
-store  = HypothesisStoreTool()
+search  = LiteratureSearchTool()
+store   = HypothesisStoreTool()
+execute = ColabExecuteTool()
 
 my_agent = Agent(
     role="Hypothesis Generator",
-    goal="Generate novel hypotheses based on literature.",
-    tools=[search, store],
+    goal="Generate and immediately test novel hypotheses with code.",
+    tools=[search, store, execute],
     llm=my_llm,
 )
 ```
+
+The three Colab tools require the `colab-mcp` server to be running. See [colab.md](colab.md) for setup instructions.
