@@ -11,6 +11,7 @@ from researchcrew.agents.proximity import make_proximity_agent
 from researchcrew.agents.ranking import make_ranking_agent
 from researchcrew.agents.reflection import make_reflection_agent
 from researchcrew.agents.supervisor import make_supervisor_agent
+from researchcrew.tools.colab_tool import ColabExecuteTool, ColabInstallTool, ColabRuntimeTool
 from researchcrew.tools.debate_tool import DebateTool
 from researchcrew.tools.hypothesis_store import HypothesisStoreTool
 from researchcrew.tools.literature_search import LiteratureSearchTool
@@ -21,6 +22,7 @@ def make_co_scientist_crew(
     llm: Any | None = None,
     verbose: bool = False,
     max_tournament_rounds: int = 3,
+    use_colab: bool = False,
 ) -> Crew:
     """Assemble a full Co-Scientist crew (7 agents, hierarchical process).
 
@@ -28,11 +30,19 @@ def make_co_scientist_crew(
 
         crew = make_co_scientist_crew(llm=my_llm)
         result = crew.kickoff(inputs={"research_goal": "...", "domain": "biomedicine"})
+
+    Pass ``use_colab=True`` to give the Evolution agent access to a live
+    Google Colab runtime for running experiments during hypothesis refinement.
+    Requires the ``colab-mcp`` server (configured in ``.mcp.json``).
     """
     search_tool = LiteratureSearchTool()
     store_tool = HypothesisStoreTool()
     debate_tool = DebateTool()
     memory_tool = MemoryQueryTool()
+
+    evolution_tools: list[Any] = [store_tool, memory_tool]
+    if use_colab:
+        evolution_tools += [ColabExecuteTool(), ColabInstallTool(), ColabRuntimeTool()]
 
     generation = make_generation_agent(
         llm=llm, tools=[search_tool, store_tool], verbose=verbose
@@ -40,7 +50,7 @@ def make_co_scientist_crew(
     reflection = make_reflection_agent(llm=llm, tools=[store_tool], verbose=verbose)
     ranking = make_ranking_agent(llm=llm, tools=[debate_tool, store_tool], verbose=verbose)
     evolution = make_evolution_agent(
-        llm=llm, tools=[store_tool, memory_tool], verbose=verbose
+        llm=llm, tools=evolution_tools, verbose=verbose
     )
     proximity = make_proximity_agent(llm=llm, tools=[store_tool], verbose=verbose)
     meta_review = make_meta_review_agent(llm=llm, tools=[memory_tool], verbose=verbose)

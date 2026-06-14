@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "researchcrew-papers": {
+      "command": "python",
+      "args": ["-m", "researchcrew.mcp.papers"],
+      "description": "ResearchCrew paper search — arXiv, Semantic Scholar, PubMed, OpenAlex"
+    },
+    "colab-mcp": {
+      "command": "uvx",
+      "args": ["git+https://github.com/googlecolab/colab-mcp"],
+      "timeout": 30000,
+      "description": "Google Colab runtime — execute Python code with GPU/TPU access"
+    }
+  }
+}
