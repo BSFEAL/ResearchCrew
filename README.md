@@ -3,15 +3,18 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/bsfeal/researchcrew/stargazers"><img src="https://img.shields.io/github/stars/bsfeal/researchcrew?style=flat&logo=github&color=yellow" alt="GitHub Stars"/></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue?logo=python&logoColor=white" alt="Python Versions"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"/></a>
   <img src="https://img.shields.io/badge/tests-passing-brightgreen" alt="Tests"/>
-  <img src="https://img.shields.io/badge/status-alpha-orange" alt="Status"/>
+  <a href="https://github.com/bsfeal/researchcrew/issues"><img src="https://img.shields.io/github/issues/bsfeal/researchcrew?color=blue" alt="Open Issues"/></a>
+  <img src="https://img.shields.io/badge/code%20style-ruff-000000?logo=ruff" alt="Ruff"/>
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome"/>
 </p>
 
 <p align="center">
-  <strong>A multi-agent scientific research library built on CrewAI.</strong><br/>
-  Hypothesis generation · Literature review · Paper writing · MCP paper search · TUI chat interface.
+  <strong>Autonomous AI agents that generate, debate, and evolve scientific hypotheses — then write the paper.</strong><br/>
+  Built on <a href="https://github.com/joaomdmoura/crewAI">CrewAI</a> · Elo tournament engine · Progressive MCGS · Google Colab experiments · MCP paper search · TUI research chat
 </p>
 
 ---
@@ -25,7 +28,23 @@ ResearchCrew is a Python library that automates the full scientific research lif
 
 Both crews accept any LLM through a unified `ResearchLLM` interface supporting Anthropic Claude, OpenAI GPT, and Google Gemini — all with a single `create_llm()` call.
 
-Additional tools include a **FastMCP paper-search server** (arXiv, Semantic Scholar, PubMed, OpenAlex) and a **Rich/prompt_toolkit TUI chat interface** (`researchcrew-chat`) for managing research projects through natural language.
+Additional tools include a **FastMCP paper-search server** (arXiv, Semantic Scholar, PubMed, OpenAlex), a **Google Colab runtime connector** (execute experiments with GPU access), and a **Rich/prompt_toolkit TUI** (`researchcrew-chat`) for interactive project management.
+
+---
+
+## Highlights
+
+| | Feature | Details |
+|---|---|---|
+| 🧬 | **Hypothesis Tournament** | 7 agents generate, score, cluster, and battle ideas in an Elo-rated debate ring — bottom 30% eliminated each round |
+| 📄 | **Full Paper Writing** | Literature → outline → section drafting → simulated peer review in one `crew.kickoff()` call |
+| 🔬 | **Live Colab Experiments** | Evolution agent runs Python on a GPU Colab runtime to validate hypotheses before ranking (`use_colab=True`) |
+| 🔍 | **4-Source Literature Search** | arXiv · Semantic Scholar · PubMed · OpenAlex with cross-source deduplication |
+| 🧠 | **Persistent Memory** | BM25 + FAISS ensemble retrieval that learns across research sessions |
+| 🗺️ | **MCGS Exploration** | Monte Carlo Graph Search navigates hypothesis space beyond a single tournament cycle |
+| 💬 | **TUI Research Chat** | Terminal interface with 16 slash commands, project persistence, code artifact saving |
+| 🔌 | **Provider-Agnostic LLM** | Claude (adaptive thinking) · GPT-4o · Gemini — swap providers in one line |
+| 🔗 | **MCP Ready** | `.mcp.json` auto-connects both paper-search and Colab servers for Claude Code / Claude Desktop |
 
 ---
 
@@ -458,16 +477,30 @@ for node in graph.best_nodes(3):
 
 | File | Description |
 |---|---|
-| `examples/drug_repurposing.py` | Co-Scientist crew on AML / liver fibrosis |
-| `examples/literature_synthesis.py` | Literature survey + paper writing crew |
-| `examples/ml_algo_discovery.py` | Progressive MCGS on a Kaggle-style benchmark |
+| `examples/hypothesis_to_paper.py` | **Flagship** — full end-to-end: tournament → paper draft → Markdown export |
+| `examples/drug_repurposing.py` | Co-Scientist crew on AML epigenetic drug repurposing |
+| `examples/literature_synthesis.py` | Literature survey + paper writing crew on long-context attention |
+| `examples/ml_algo_discovery.py` | Progressive MCGS on tabular ML algorithm discovery (no LLM needed) |
 
-Run any example (requires `pip install 'researchcrew[llm]'` and an API key):
+Run the flagship demo (requires `pip install 'researchcrew[llm]'` and an API key):
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-python examples/drug_repurposing.py
+
+# Default: sparse attention paper for NeurIPS
+python examples/hypothesis_to_paper.py
+
+# Custom topic
+python examples/hypothesis_to_paper.py \
+  --topic "CRISPR off-target effects in gene therapy" \
+  --domain biomedicine \
+  --venue Nature
+
+# With live Colab GPU experiments during hypothesis evolution
+python examples/hypothesis_to_paper.py --colab
 ```
+
+The output Markdown paper is written to `outputs/<slug>_<timestamp>.md`.
 
 ---
 
